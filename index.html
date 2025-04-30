@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Registration</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 2em auto; }
+    label { display: block; margin: .5em 0 .2em; }
+    input, textarea, button { width: 100%; padding: .5em; margin-bottom: 1em; }
+  </style>
+</head>
+<body>
+  <h1>Register Your Research</h1>
+  <form id="regForm">
+    <label for="stuId">Student ID</label>
+    <input type="text" id="stuId" required>
+
+    <label for="stuName">Name</label>
+    <input type="text" id="stuName" required>
+
+    <label for="stuMail">Email</label>
+    <input type="email" id="stuMail" required>
+
+    <label for="stuTopic">Research Topic</label>
+    <textarea id="stuTopic" rows="3" required></textarea>
+
+    <label for="stuPhoto">Photo (will be stored)</label>
+    <input type="file" id="stuPhoto" accept="image/*" required>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <p>
+    <a href="view.html">→ View Registered Students (password required)</a>
+  </p>
+
+  <script>
+    const form = document.getElementById('regForm');
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      // read form values
+      const id    = document.getElementById('stuId').value.trim();
+      const name  = document.getElementById('stuName').value.trim();
+      const mail  = document.getElementById('stuMail').value.trim();
+      const topic = document.getElementById('stuTopic').value.trim();
+      const file  = document.getElementById('stuPhoto').files[0];
+      if (!file) return alert('Please select a photo.');
+
+      // convert photo to data URL
+      const dataURL = await new Promise(res => {
+        const reader = new FileReader();
+        reader.onload = () => res(reader.result);
+        reader.readAsDataURL(file);
+      });
+
+      // get existing array or start new
+      const students = JSON.parse(localStorage.getItem('students') || '[]');
+      students.push({ id, name, mail, topic, photo: dataURL });
+      localStorage.setItem('students', JSON.stringify(students));
+
+      alert('Registration saved!');
+      form.reset();
+    });
+  </script>
+</body>
+</html>

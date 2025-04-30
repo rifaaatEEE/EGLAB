@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Students</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 2em auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1em; }
+    th, td { padding: .5em; border: 1px solid #ccc; text-align: left; }
+    img { max-height: 80px; }
+    #login { max-width: 300px; }
+    #roster { display: none; }
+  </style>
+</head>
+<body>
+  <h1>Registered Students</h1>
+
+  <div id="login">
+    <label for="pwd">Enter Password:</label>
+    <input type="password" id="pwd">
+    <button id="btnLogin">Unlock</button>
+  </div>
+
+  <div id="roster">
+    <button id="btnBack">← Back</button>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Name</th><th>Email</th><th>Topic</th><th>Photo</th>
+        </tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const PWD = 'EGLAB';
+    const loginDiv = document.getElementById('login');
+    const rosterDiv = document.getElementById('roster');
+    const tblBody   = document.getElementById('tblBody');
+    const btnBack   = document.getElementById('btnBack');
+
+    document.getElementById('btnLogin').addEventListener('click', () => {
+      const v = document.getElementById('pwd').value;
+      if (v === PWD) {
+        showRoster();
+      } else {
+        alert('Wrong password.');
+      }
+    });
+
+    btnBack.addEventListener('click', () => {
+      rosterDiv.style.display = 'none';
+      loginDiv.style.display = '';
+      document.getElementById('pwd').value = '';
+    });
+
+    function showRoster() {
+      loginDiv.style.display = 'none';
+      rosterDiv.style.display = '';
+      const students = JSON.parse(localStorage.getItem('students') || '[]');
+      if (!students.length) {
+        tblBody.innerHTML = '<tr><td colspan="5">No registrations yet.</td></tr>';
+        return;
+      }
+      tblBody.innerHTML = students.map(s => `
+        <tr>
+          <td>${s.id}</td>
+          <td>${s.name}</td>
+          <td><a href="mailto:${s.mail}">${s.mail}</a></td>
+          <td>${s.topic}</td>
+          <td>
+            <img src="${s.photo}" alt="photo of ${s.name}">
+            <br>
+            <a href="${s.photo}" download="${s.id}_${s.name}.png">Download Original</a>
+          </td>
+        </tr>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
